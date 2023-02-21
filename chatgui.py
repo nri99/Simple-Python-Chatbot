@@ -9,6 +9,8 @@ from keras.models import load_model
 model = load_model('chatbot_model.h5')
 import json
 import random
+import datetime
+
 intents = json.loads(open('intents.json').read())
 words = pickle.load(open('words.pkl','rb'))
 classes = pickle.load(open('classes.pkl','rb'))
@@ -55,10 +57,25 @@ def getResponse(ints, intents_json):
         if(i['tag']== tag):
             result = random.choice(i['responses'])
             break
+
+    # Check if the tag is date so bot can show the date
+    if(tag == 'date'):
+        now = datetime.datetime.now()
+        date_time = now.strftime("%m/%d/%Y, %H:%M:%S")
+        result += date_time
+    
+    # Check if the tag is time so bot can show time
+    if(tag == 'time'):
+        now = datetime.datetime.now()
+        time = now.strftime("%H:%M:%S")
+        result += time
+    
     return result
 
 def chatbot_response(msg):
     ints = predict_class(msg, model)
+    print("\n\n")
+    print(ints)
     res = getResponse(ints, intents)
     return res
 

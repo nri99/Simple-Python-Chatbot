@@ -48,6 +48,16 @@
          "patterns": ["What is a hybrid car?"],
          "responses": ["A hybrid car is a vehicle that uses both an electric motor and a gasoline engine to power the vehicle."],
          "context": [""]
-        }
+        },
+        {"tag": "date",
+         "patterns": ["What is the date", "date right now"],
+         "responses": ["The date right now is: "],
+         "context": [""]
+       },
+       {"tag": "time",
+        "patterns": ["What is the time", "time right now", "What time is it"],
+        "responses": ["The time right now is: "],
+        "context": [""]
+       }
     ]
  }
