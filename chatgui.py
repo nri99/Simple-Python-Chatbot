@@ -12,8 +12,6 @@ import random
 import datetime
 import requests
 
-nltk.download('punkt')
-nltk.download('wordnet')
 
 
 intents = json.loads(open('intents.json').read())
