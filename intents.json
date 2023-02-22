@@ -58,6 +58,13 @@
         "patterns": ["What is the time", "time right now", "What time is it"],
         "responses": ["The time right now is: "],
         "context": [""]
+       },
+       {"tag": "news",
+        "patterns": ["Give me some * news", "* news"],
+        "responses": ["I found this: "],
+        "context": [""]
        }
+
+
     ]
  }

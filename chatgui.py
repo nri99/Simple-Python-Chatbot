@@ -10,11 +10,13 @@ model = load_model('chatbot_model.h5')
 import json
 import random
 import datetime
+import requests
+
+
 
 intents = json.loads(open('intents.json').read())
 words = pickle.load(open('words.pkl','rb'))
 classes = pickle.load(open('classes.pkl','rb'))
-
 
 def clean_up_sentence(sentence):
     sentence_words = nltk.word_tokenize(sentence)
@@ -57,18 +59,6 @@ def getResponse(ints, intents_json):
         if(i['tag']== tag):
             result = random.choice(i['responses'])
             break
-
-    # Check if the tag is date so bot can show the date
-    if(tag == 'date'):
-        now = datetime.datetime.now()
-        date_time = now.strftime("%m/%d/%Y, %H:%M:%S")
-        result += date_time
-    
-    # Check if the tag is time so bot can show time
-    if(tag == 'time'):
-        now = datetime.datetime.now()
-        time = now.strftime("%H:%M:%S")
-        result += time
     
     return result
 
@@ -77,58 +67,108 @@ def chatbot_response(msg):
     print("\n\n")
     print(ints)
     res = getResponse(ints, intents)
+
+    tag = ints[0]['intent']
+    # Check if the tag is date so bot can show the date
+    if(tag == 'date'):
+        now = datetime.datetime.now()
+        date_time = now.strftime("%m/%d/%Y, %H:%M:%S")
+        res += date_time
+    
+    # Check if the tag is time so bot can show time
+    if(tag == 'time'):
+        now = datetime.datetime.now()
+        time = now.strftime("%H:%M:%S")
+        res += time
+
+    # Check if the tag is about any news
+    if(tag == 'news'):
+
+        lis = list(msg.split(" "))
+        # length of list
+        length = len(lis)
+        about = lis[length-2]
+
+        url = ('https://newsapi.org/v2/everything?'
+               'q=' + about + '&'
+               'from=2023-02-20&'
+               'sortBy=popularity&'
+               'apiKey=765f751d01f646858f0c165aea4b0e28')
+        print(url)
+
+        http_res = requests.get(url)
+        json_dict = http_res.json()
+        source_name = json_dict['articles'][0]['source']['name']
+        title = json_dict['articles'][0]['title']
+        desc = json_dict['articles'][0]['description']
+        url = json_dict['articles'][0]['url']
+        message("Source: " + source_name)
+        message("Title: " + title)
+        message("Description: " + desc)
+        message("URL: " + url)
+        res += '\n Source: ' + source_name + '\n Title: ' + title + '\n Description: ' + desc + '\n\n URL: ' + url
     return res
 
 
-#Creating GUI with tkinter
-import tkinter
-from tkinter import *
+# #Creating GUI with tkinter
+# import tkinter
+# from tkinter import *
 
 
-def send():
-    msg = EntryBox.get("1.0",'end-1c').strip()
-    EntryBox.delete("0.0",END)
+# def send():
+#     msg = EntryBox.get("1.0",'end-1c').strip()
+#     EntryBox.delete("0.0",END)
 
-    if msg != '':
-        ChatLog.config(state=NORMAL)
-        ChatLog.insert(END, "You: " + msg + '\n\n')
-        ChatLog.config(foreground="#442265", font=("Verdana", 12 ))
+#     if msg != '':
+#         ChatLog.config(state=NORMAL)
+#         ChatLog.insert(END, "You: " + msg + '\n\n')
+#         ChatLog.config(foreground="#442265", font=("Verdana", 12 ))
 
-        res = chatbot_response(msg)
-        ChatLog.insert(END, "Bot: " + res + '\n\n')
+#         res = chatbot_response(msg)
+#         ChatLog.insert(END, "Bot: " + res + '\n\n')
 
-        ChatLog.config(state=DISABLED)
-        ChatLog.yview(END)
-
-
-base = Tk()
-base.title("Hello")
-base.geometry("400x500")
-base.resizable(width=FALSE, height=FALSE)
-
-#Create Chat window
-ChatLog = Text(base, bd=0, bg="white", height="8", width="50", font="Arial",)
-
-ChatLog.config(state=DISABLED)
-
-#Bind scrollbar to Chat window
-scrollbar = Scrollbar(base, command=ChatLog.yview, cursor="heart")
-ChatLog['yscrollcommand'] = scrollbar.set
-
-#Create Button to send message
-SendButton = Button(base, font=("Verdana",12,'bold'), text="Send", width="12", height=5,
-                    bd=0, bg="#32de97", activebackground="#3c9d9b",fg='#ffffff',
-                    command= send )
-
-#Create the box to enter message
-EntryBox = Text(base, bd=0, bg="white",width="29", height="5", font="Arial")
-#EntryBox.bind("<Return>", send)
+#         ChatLog.config(state=DISABLED)
+#         ChatLog.yview(END)
 
 
-#Place all components on the screen
-scrollbar.place(x=376,y=6, height=386)
-ChatLog.place(x=6,y=6, height=386, width=370)
-EntryBox.place(x=128, y=401, height=90, width=265)
-SendButton.place(x=6, y=401, height=90)
+# base = Tk()
+# base.title("Hello")
+# base.geometry("400x500")
+# base.resizable(width=FALSE, height=FALSE)
 
-base.mainloop()
+# #Create Chat window
+# ChatLog = Text(base, bd=0, bg="white", height="8", width="50", font="Arial",)
+
+# ChatLog.config(state=DISABLED)
+
+# #Bind scrollbar to Chat window
+# scrollbar = Scrollbar(base, command=ChatLog.yview, cursor="heart")
+# ChatLog['yscrollcommand'] = scrollbar.set
+
+# #Create Button to send message
+# SendButton = Button(base, font=("Verdana",12,'bold'), text="Send", width="12", height=5,
+#                     bd=0, bg="#32de97", activebackground="#3c9d9b",fg='#ffffff',
+#                     command= send )
+
+# #Create the box to enter message
+# EntryBox = Text(base, bd=0, bg="white",width="29", height="5", font="Arial")
+# #EntryBox.bind("<Return>", send)
+
+
+# #Place all components on the screen
+# scrollbar.place(x=376,y=6, height=386)
+# ChatLog.place(x=6,y=6, height=386, width=370)
+# EntryBox.place(x=128, y=401, height=90, width=265)
+# SendButton.place(x=6, y=401, height=90)
+
+# base.mainloop()
+
+
+# Test streamlit web interface
+import streamlit as st
+from streamlit_chat import message
+user_input = st.text_input("label goes here")
+message(user_input, is_user=True)
+
+# Zeebot response
+message(chatbot_response(user_input))
