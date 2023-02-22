@@ -61,7 +61,7 @@
        },
        {"tag": "news",
         "patterns": ["Give me some * news", "* news"],
-        "responses": ["I found this: "],
+        "responses": [""],
         "context": [""]
        }
 

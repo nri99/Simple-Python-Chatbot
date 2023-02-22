@@ -106,7 +106,6 @@ def chatbot_response(msg):
         message("Title: " + title)
         message("Description: " + desc)
         message("URL: " + url)
-        res += '\n Source: ' + source_name + '\n Title: ' + title + '\n Description: ' + desc + '\n\n URL: ' + url
     return res
 
 
